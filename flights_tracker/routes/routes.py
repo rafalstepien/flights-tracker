@@ -10,3 +10,8 @@ def get_weekend_flights(http_request: Request):
     app.email_sender.send_email(message)
 
     return Response(status_code=200)
+
+
+@router.get("/")
+def hello_world():
+    return {"message": "Hello world!"}
