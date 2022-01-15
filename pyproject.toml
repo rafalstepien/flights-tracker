@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "flights-tracker"
+version = "0.1.0"
+description = ""
+authors = ["Rafał Stępień"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pre-commit = "^2.16.0"
+flake8 = "^4.0.1"
+black = "^21.12b0"
+isort = "^5.10.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 120
+multi_line_output = 3
+use_parentheses = true
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]
+
+[tool.coverage.run]
+omit = ["tests/*", "*__init__.py"]

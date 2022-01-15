@@ -1,0 +1,25 @@
+############   Short summary   ##################
+# <type>[optional scope]: <description>
+# The allowed {types} are as follows:
+# chore -> maintenance
+# docs -> documentation
+# feat -> feature
+# fix -> bug fix
+# drop -> remove code
+# style -> formatting/style changes
+# refactor -> refactoring code
+# test -> adding missing tests
+
+
+##################   Body   ###########################################
+# [optional body]
+
+
+##########################    Footer    ###############################
+
+# [optional footer(s)]
+
+# The {scope} can be anything specifying place of the commit change.
+# The {subject} needs to use imperative, present tense: “change”, not “changed” nor “changes”. The first letter should not be capitalized, and there is no dot (.) at the end.
+# Just like the {subject}, the message {body} needs to be in the present tense, and includes the motivation for the change, as well as a contrast with the previous behaviour. The first letter in a paragraph must be capitalised.
+# All breaking changes need to be mentioned in the {footer} with the description of the change, the justification behind the change and any migration notes required.
