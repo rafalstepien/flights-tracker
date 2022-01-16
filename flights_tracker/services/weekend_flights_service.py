@@ -1,5 +1,8 @@
 from typing import List
 
+import httpx
+
+from config_loader.config_loader import config
 from flights_tracker.models.weekend_flights import WeekendFlight
 from flights_tracker.static import (
     AZairBool,
@@ -18,8 +21,6 @@ class WeekendFlightsService:
     Service for obtaining flights data, processing it and returning as ready-to-send message.
     """
 
-    BASE_AZAIR_URL = "https://www.azair.eu/azfin.php"
-
     def process(self):
         data = self.obtain_flights_data()
         data = self.parse_flights_data(data)
@@ -33,13 +34,12 @@ class WeekendFlightsService:
         Returns: Flights XML data as string
 
         """
-        request = self._prepare_request()
-        return self._send_request(request)
+        request = self._prepare_url()
+        return self.send_request(request)
 
-    def _prepare_request(self):
+    def _prepare_url(self):
         query_params = self._get_query_params()
-        url = f"{WeekendFlightsService.BASE_AZAIR_URL}?{query_params}"
-        return url
+        return f"{config.BASE_AZAIR_URL}?{query_params}"
 
     def _get_query_params(self) -> str:
         """
@@ -111,6 +111,12 @@ class WeekendFlightsService:
             f"currency={Currency.EURO}&"
             f"indexSubmit=Search"
         )
+
+    def send_request(self, url):
+        return httpx.get(
+            url,
+            timeout=config.TIMEOUT,
+        ).text
 
     def parse_flights_data(self, data: str) -> List[WeekendFlight]:
         """
