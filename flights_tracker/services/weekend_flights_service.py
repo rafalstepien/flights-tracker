@@ -1,6 +1,7 @@
 from typing import List
 
-from flights_tracker.azair_tracker.static import (
+from flights_tracker.models.weekend_flights import WeekendFlight
+from flights_tracker.static import (
     AZairBool,
     CountryCodes,
     Currency,
@@ -10,7 +11,6 @@ from flights_tracker.azair_tracker.static import (
     UnknownParam,
     Weekdays,
 )
-from flights_tracker.models.weekend_flights import WeekendFlight
 
 
 class WeekendFlightsService:
