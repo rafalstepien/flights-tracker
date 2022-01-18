@@ -1,14 +1,39 @@
 from pydantic import BaseModel
+from enum import Enum
 
 
 class Airport(BaseModel):
     city: str
     country: str
+    code: str
 
 
-class WeekendFlight(BaseModel):
-    from_airport: Airport
-    destination_airport: Airport
+class WhichWay(Enum):
+    THERE = "There"
+    BACK = "Back"
+
+
+class OneWayFlight(BaseModel):
+    which_way: WhichWay
+    flight_length: str
+    price_euro: str
+    number_of_changes: int
+
     departure_date: str
-    comeback_date: str
-    price: float
+    departure_time: str
+    departure_airport: Airport
+
+    arrival_time: str
+    arrival_airport: Airport
+
+    class Config:
+        use_enum_values = True
+
+
+class Flight(BaseModel):
+    flight_there: OneWayFlight
+    flight_back: OneWayFlight
+    airline: str
+
+
+# TODO: Handle overnight fligts
