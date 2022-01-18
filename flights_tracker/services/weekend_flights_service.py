@@ -1,9 +1,12 @@
-from typing import List
+from typing import List, Union, Tuple
 
+import bs4.element
 import httpx
+import re
+from bs4 import BeautifulSoup
 
 from config_loader.config_loader import config
-from flights_tracker.models.weekend_flights import WeekendFlight
+from flights_tracker.models.weekend_flights import Flight
 from flights_tracker.static import (
     AZairBool,
     CountryCodes,
@@ -36,6 +39,32 @@ class WeekendFlightsService:
         """
         request = self._prepare_url()
         return self.send_request(request)
+
+    def parse_flights_data(self, data: str) -> List[Flight]:
+        """
+        Extract just weekend flights and return them correctly formatted.
+
+        Args:
+            data: Raw data scraped from website.
+
+        Returns: List of weekend flights in correct format.
+
+        """
+        all_flights = self._extract_all_flights(data)
+        return self._process_all_flights(all_flights)
+
+
+    def prepare_email_message(self, data: List[Flight]) -> str:
+        """
+        Create ready-to-send email message from all weekeend flights.
+
+        Args:
+            data: List of weekend flights in correct format.
+
+        Returns: Ready-to send e-mail message content.
+
+        """
+        return ""
 
     def _prepare_url(self):
         query_params = self._get_query_params()
@@ -118,26 +147,66 @@ class WeekendFlightsService:
             timeout=config.TIMEOUT,
         ).text
 
-    def parse_flights_data(self, data: str) -> List[WeekendFlight]:
-        """
-        Extract just weekend flights and return them correctly formatted.
+    def _extract_all_flights(self, data: str) -> bs4.element.ResultSet:
+        soup = BeautifulSoup(data, 'html.parser')
+        return soup.find_all("div", {"class": "result"})
 
-        Args:
-            data: Raw data scraped from website.
+    def _process_all_flights(self, all_flights_data: bs4.element.ResultSet) -> List[Flight]:
+        available_flights = []
+        for single_flight_div in all_flights_data:
+            single_flight_data = self._extract_single_flight_data(single_flight_div)
+            available_flights.append(Flight(**single_flight_data))
+        return available_flights
 
-        Returns: List of weekend flights in correct format.
+    def _extract_single_flight_data(self, single_flight_div: bs4.element.Tag) -> dict:
+        there_data = single_flight_div.select("p span.caption.tam")[0].parent
+        there_flight_length, there_number_of_changes = self._get_flight_time_and_changes(there_data)
+        back_data = single_flight_div.select("p span.caption.sem")[0].parent
+        return {
+            "flight_there": {
+                'which_way': self._get_element_value(there_data.select("span.caption.tam")),
+                'flight_length': there_flight_length,
+                'price_euro':  self._get_element_value(there_data.select("span.subPrice")).replace("€", ""),
+                'number_of_changes':  there_number_of_changes,
+                'departure_date':  self._get_element_value(there_data.select("span.date")), # Weekday day/month/year-two-digits
+                'departure_time':  self._get_element_value(there_data.select("span.from")[0].select("strong")),
+                'departure_airport':  {
+                    "city": "",
+                    "country": "",
+                    "code": "",
+                },
+                'arrival_time':  self._get_element_value(there_data.select("span.caption.tam")),
+                'arrival_airport': {
+                    "city": "",
+                    "country": "",
+                    "code": "",
+                },
+            },
+            "flight_back": {
+                'which_way': "",
+                'flight_time': "",
+                'price_euro': "",
+                'number_of_changes': "",
+                'departure_date': "",
+                'departure_time': "",
+                'departure_airport': "",
+                'arrival_time': "",
+                'arrival_airport': "",
+            },
+            "airline": "",
+        }
 
-        """
-        return []
+    @staticmethod
+    def _get_flight_time_and_changes(there_data: bs4.element.Tag) -> Tuple[str, str]:
+        time_and_changes = WeekendFlightsService._get_element_value(there_data.select("span.durcha"))
+        pattern_time, pattern_changes = r"\d+:\d+\s", r"\s\d+\s"
+        time, changes = re.search(pattern_time, time_and_changes), re.search(pattern_changes, time_and_changes)
+        time, changes = time.group().strip(), changes.group().strip()
+        return time, changes
 
-    def prepare_email_message(self, data: List[WeekendFlight]) -> str:
-        """
-        Create ready-to-send email message from all weekeend flights.
-
-        Args:
-            data: List of weekend flights in correct format.
-
-        Returns: Ready-to send e-mail message content.
-
-        """
-        return ""
+    @staticmethod
+    def _get_element_value(element) -> Union[str, None]:
+        try:
+            return element[0].string
+        except (IndexError, AttributeError):
+            return None
