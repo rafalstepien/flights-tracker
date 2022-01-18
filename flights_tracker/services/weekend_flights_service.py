@@ -1,8 +1,8 @@
-from typing import List, Union, Tuple
+import re
+from typing import List, Tuple, Union
 
 import bs4.element
 import httpx
-import re
 from bs4 import BeautifulSoup
 
 from config_loader.config_loader import config
@@ -53,7 +53,6 @@ class WeekendFlightsService:
         all_flights = self._extract_all_flights(data)
         return self._process_all_flights(all_flights)
 
-
     def prepare_email_message(self, data: List[Flight]) -> str:
         """
         Create ready-to-send email message from all weekeend flights.
@@ -70,6 +69,7 @@ class WeekendFlightsService:
         query_params = self._get_query_params()
         return f"{config.BASE_AZAIR_URL}?{query_params}"
 
+    @staticmethod
     def _get_query_params(self) -> str:
         """
         Fill the query params.
@@ -141,14 +141,16 @@ class WeekendFlightsService:
             f"indexSubmit=Search"
         )
 
-    def send_request(self, url):
+    @staticmethod
+    def send_request(url):
         return httpx.get(
             url,
             timeout=config.TIMEOUT,
         ).text
 
+    @staticmethod
     def _extract_all_flights(self, data: str) -> bs4.element.ResultSet:
-        soup = BeautifulSoup(data, 'html.parser')
+        soup = BeautifulSoup(data, "html.parser")
         return soup.find_all("div", {"class": "result"})
 
     def _process_all_flights(self, all_flights_data: bs4.element.ResultSet) -> List[Flight]:
@@ -164,34 +166,36 @@ class WeekendFlightsService:
         back_data = single_flight_div.select("p span.caption.sem")[0].parent
         return {
             "flight_there": {
-                'which_way': self._get_element_value(there_data.select("span.caption.tam")),
-                'flight_length': there_flight_length,
-                'price_euro':  self._get_element_value(there_data.select("span.subPrice")).replace("€", ""),
-                'number_of_changes':  there_number_of_changes,
-                'departure_date':  self._get_element_value(there_data.select("span.date")), # Weekday day/month/year-two-digits
-                'departure_time':  self._get_element_value(there_data.select("span.from")[0].select("strong")),
-                'departure_airport':  {
+                "which_way": self._get_element_value(there_data.select("span.caption.tam")),
+                "flight_length": there_flight_length,
+                "price_euro": self._get_element_value(there_data.select("span.subPrice")).replace("€", ""),
+                "number_of_changes": there_number_of_changes,
+                "departure_date": self._get_element_value(
+                    there_data.select("span.date")
+                ),  # Weekday day/month/year-two-digits
+                "departure_time": self._get_element_value(there_data.select("span.from")[0].select("strong")),
+                "departure_airport": {
                     "city": "",
                     "country": "",
                     "code": "",
                 },
-                'arrival_time':  self._get_element_value(there_data.select("span.caption.tam")),
-                'arrival_airport': {
+                "arrival_time": self._get_element_value(there_data.select("span.caption.tam")),
+                "arrival_airport": {
                     "city": "",
                     "country": "",
                     "code": "",
                 },
             },
             "flight_back": {
-                'which_way': "",
-                'flight_time': "",
-                'price_euro': "",
-                'number_of_changes': "",
-                'departure_date': "",
-                'departure_time': "",
-                'departure_airport': "",
-                'arrival_time': "",
-                'arrival_airport': "",
+                "which_way": "",
+                "flight_time": "",
+                "price_euro": "",
+                "number_of_changes": "",
+                "departure_date": "",
+                "departure_time": "",
+                "departure_airport": "",
+                "arrival_time": "",
+                "arrival_airport": "",
             },
             "airline": "",
         }
