@@ -70,7 +70,7 @@ class WeekendFlightsService:
         return f"{config.BASE_AZAIR_URL}?{query_params}"
 
     @staticmethod
-    def _get_query_params(self) -> str:
+    def _get_query_params() -> str:
         """
         Fill the query params.
 
@@ -149,7 +149,7 @@ class WeekendFlightsService:
         ).text
 
     @staticmethod
-    def _extract_all_flights(self, data: str) -> bs4.element.ResultSet:
+    def _extract_all_flights(data: str) -> bs4.element.ResultSet:
         soup = BeautifulSoup(data, "html.parser")
         return soup.find_all("div", {"class": "result"})
 
