@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 class Airport(BaseModel):
     city: str
-    country: str
     code: str
 
 

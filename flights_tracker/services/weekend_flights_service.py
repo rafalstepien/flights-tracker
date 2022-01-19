@@ -17,6 +17,7 @@ from flights_tracker.static import (
     UnknownParam,
     Weekdays,
 )
+from flights_tracker.utils.error_handling.error_handler import handle_errors
 
 
 class WeekendFlightsService:
@@ -143,10 +144,11 @@ class WeekendFlightsService:
 
     @staticmethod
     def send_request(url):
-        return httpx.get(
-            url,
-            timeout=config.TIMEOUT,
-        ).text
+        with handle_errors(httpx.ReadTimeout):
+            return httpx.get(
+                url,
+                timeout=config.TIMEOUT,
+            ).text
 
     @staticmethod
     def _extract_all_flights(data: str) -> bs4.element.ResultSet:
@@ -163,49 +165,67 @@ class WeekendFlightsService:
     def _extract_single_flight_data(self, single_flight_div: bs4.element.Tag) -> dict:
         there_data = single_flight_div.select("p span.caption.tam")[0].parent
         there_flight_length, there_number_of_changes = self._get_flight_time_and_changes(there_data)
+        there_arrival_time, _, there_arrival_airport = (
+            there_data.select("span.to")[0].next_element.text.strip().partition(" ")
+        )
         back_data = single_flight_div.select("p span.caption.sem")[0].parent
-        return {
+        back_flight_length, back_number_of_changes = self._get_flight_time_and_changes(back_data)
+        back_arrival_time, _, back_arrival_airport = (
+            back_data.select("span.to")[0].next_element.text.strip().partition(" ")
+        )
+        data = {
             "flight_there": {
                 "which_way": self._get_element_value(there_data.select("span.caption.tam")),
                 "flight_length": there_flight_length,
                 "price_euro": self._get_element_value(there_data.select("span.subPrice")).replace("€", ""),
                 "number_of_changes": there_number_of_changes,
-                "departure_date": self._get_element_value(
-                    there_data.select("span.date")
-                ),  # Weekday day/month/year-two-digits
+                "departure_date": self._get_element_value(there_data.select("span.date")),
                 "departure_time": self._get_element_value(there_data.select("span.from")[0].select("strong")),
                 "departure_airport": {
-                    "city": "",
-                    "country": "",
-                    "code": "",
+                    "city": there_data.select("span.from")[0].next_element.next_sibling.text.strip(),
+                    "code": there_data.select("span.from")[
+                        0
+                    ].next_element.next_sibling.next_element.next_element.text.strip(),
                 },
-                "arrival_time": self._get_element_value(there_data.select("span.caption.tam")),
+                "arrival_time": there_arrival_time,
                 "arrival_airport": {
-                    "city": "",
-                    "country": "",
-                    "code": "",
+                    "city": there_arrival_airport,
+                    "code": there_data.select("span.to")[0].next_element.next_sibling.next_element.text.strip(),
                 },
             },
             "flight_back": {
-                "which_way": "",
-                "flight_time": "",
-                "price_euro": "",
-                "number_of_changes": "",
-                "departure_date": "",
-                "departure_time": "",
-                "departure_airport": "",
-                "arrival_time": "",
-                "arrival_airport": "",
+                "which_way": self._get_element_value(back_data.select("span.caption.sem")),
+                "flight_length": back_flight_length,
+                "price_euro": self._get_element_value(back_data.select("span.subPrice")).replace("€", ""),
+                "number_of_changes": back_number_of_changes,
+                "departure_date": self._get_element_value(back_data.select("span.date")),
+                "departure_time": self._get_element_value(back_data.select("span.from")[0].select("strong")),
+                "departure_airport": {
+                    "city": back_data.select("span.from")[0].next_element.next_sibling.text.strip(),
+                    "code": back_data.select("span.from")[
+                        0
+                    ].next_element.next_sibling.next_element.next_element.text.strip(),
+                },
+                "arrival_time": back_arrival_time,
+                "arrival_airport": {
+                    "city": back_arrival_airport,
+                    "code": back_data.select("span.to")[0].next_element.next_sibling.next_element.text.strip(),
+                },
             },
             "airline": "",
         }
+        return data
 
     @staticmethod
     def _get_flight_time_and_changes(there_data: bs4.element.Tag) -> Tuple[str, str]:
         time_and_changes = WeekendFlightsService._get_element_value(there_data.select("span.durcha"))
         pattern_time, pattern_changes = r"\d+:\d+\s", r"\s\d+\s"
         time, changes = re.search(pattern_time, time_and_changes), re.search(pattern_changes, time_and_changes)
-        time, changes = time.group().strip(), changes.group().strip()
+        if changes:
+            changes = changes.group().strip()
+        else:
+            changes = 0
+        time = time.group().strip()
         return time, changes
 
     @staticmethod
