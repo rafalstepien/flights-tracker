@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple, Union, Type
+from typing import List, Tuple, Union
 
 import bs4.element
 import httpx
@@ -195,9 +195,9 @@ class WeekendFlightsService:
                 "departure_hour": self._get_element_value(there_data["data"].select("span.from")[0].select("strong")),
                 "departure_airport": {
                     "city": there_data["data"].select("span.from")[0].next_element.next_sibling.text.strip(),
-                    "code": there_data["data"].select("span.from")[
-                        0
-                    ].next_element.next_sibling.next_element.next_element.text.strip(),
+                    "code": there_data["data"]
+                    .select("span.from")[0]
+                    .next_element.next_sibling.next_element.next_element.text.strip(),
                 },
                 "arrival_time": there_data["arrival_time"],
                 "arrival_airport": {
@@ -215,9 +215,9 @@ class WeekendFlightsService:
                 "departure_hour": self._get_element_value(back_data["data"].select("span.from")[0].select("strong")),
                 "departure_airport": {
                     "city": back_data["data"].select("span.from")[0].next_element.next_sibling.text.strip(),
-                    "code": back_data["data"].select("span.from")[
-                        0
-                    ].next_element.next_sibling.next_element.next_element.text.strip(),
+                    "code": back_data["data"]
+                    .select("span.from")[0]
+                    .next_element.next_sibling.next_element.next_element.text.strip(),
                 },
                 "arrival_time": back_data["arrival_time"],
                 "arrival_airport": {
@@ -242,25 +242,23 @@ class WeekendFlightsService:
 
         """
         if which_way == WhichWay.THERE:
-            caption_class = 'tam'
+            caption_class = "tam"
             iata_element_number = 0
         else:
-            caption_class = 'sem'
+            caption_class = "sem"
             iata_element_number = 1
 
         data = single_flight_div.select(f"p span.caption.{caption_class}")[0].parent
         flight_length, number_of_changes = WeekendFlightsService._get_flight_time_and_changes(data)
-        arrival_time, _, arrival_airport = (
-            data.select("span.to")[0].next_element.text.strip().partition(" ")
-        )
+        arrival_time, _, arrival_airport = data.select("span.to")[0].next_element.text.strip().partition(" ")
         airline = single_flight_div.select('span[class*="iata"]')[iata_element_number].text
         return {
-            'data': data,
-            'flight_length': flight_length,
-            'number_of_changes': number_of_changes,
-            'arrival_time': arrival_time,
-            'arrival_airport': arrival_airport,
-            'airline': airline
+            "data": data,
+            "flight_length": flight_length,
+            "number_of_changes": number_of_changes,
+            "arrival_time": arrival_time,
+            "arrival_airport": arrival_airport,
+            "airline": airline,
         }
 
     @staticmethod
@@ -280,7 +278,7 @@ class WeekendFlightsService:
         if changes:
             changes = changes.group().strip()
         else:
-            changes = '0'
+            changes = "0"
         time = time.group().strip()
         return time, changes
 

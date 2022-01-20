@@ -14,4 +14,3 @@ class FlightTrackerTimeoutError(BaseFlightTrackerError):
 
     message = "Data provider was unable to process the request"
     status_code = 408
-
