@@ -228,7 +228,8 @@ class WeekendFlightsService:
             },
         }
 
-    def _get_one_way_data(self, single_flight_div: bs4.element.Tag, which_way: WhichWay):
+    @staticmethod
+    def _get_one_way_data(single_flight_div: bs4.element.Tag, which_way: WhichWay):
         """
         Extracts data regarding one way flight (there or back) and returns them as a dictionary.
 
@@ -248,7 +249,7 @@ class WeekendFlightsService:
             iata_element_number = 1
 
         data = single_flight_div.select(f"p span.caption.{caption_class}")[0].parent
-        flight_length, number_of_changes = self._get_flight_time_and_changes(data)
+        flight_length, number_of_changes = WeekendFlightsService._get_flight_time_and_changes(data)
         arrival_time, _, arrival_airport = (
             data.select("span.to")[0].next_element.text.strip().partition(" ")
         )
@@ -279,7 +280,7 @@ class WeekendFlightsService:
         if changes:
             changes = changes.group().strip()
         else:
-            changes = 0
+            changes = '0'
         time = time.group().strip()
         return time, changes
 
