@@ -26,6 +26,8 @@ class OneWayFlight(BaseModel):
     arrival_time: str
     arrival_airport: Airport
 
+    airline: str
+
     class Config:
         use_enum_values = True
 
@@ -33,7 +35,6 @@ class OneWayFlight(BaseModel):
 class Flight(BaseModel):
     flight_there: OneWayFlight
     flight_back: OneWayFlight
-    airline: str
 
 
 # TODO: Handle overnight fligts

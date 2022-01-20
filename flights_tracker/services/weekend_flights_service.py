@@ -173,6 +173,8 @@ class WeekendFlightsService:
         back_arrival_time, _, back_arrival_airport = (
             back_data.select("span.to")[0].next_element.text.strip().partition(" ")
         )
+        airline_there = single_flight_div.select('span[class*="iata"]')[0].text
+        airline_back = single_flight_div.select('span[class*="iata"]')[0].text
         data = {
             "flight_there": {
                 "which_way": self._get_element_value(there_data.select("span.caption.tam")),
@@ -192,6 +194,7 @@ class WeekendFlightsService:
                     "city": there_arrival_airport,
                     "code": there_data.select("span.to")[0].next_element.next_sibling.next_element.text.strip(),
                 },
+                "airline": airline_there,
             },
             "flight_back": {
                 "which_way": self._get_element_value(back_data.select("span.caption.sem")),
@@ -211,8 +214,8 @@ class WeekendFlightsService:
                     "city": back_arrival_airport,
                     "code": back_data.select("span.to")[0].next_element.next_sibling.next_element.text.strip(),
                 },
+                "airline": airline_back,
             },
-            "airline": "",
         }
         return data
 
