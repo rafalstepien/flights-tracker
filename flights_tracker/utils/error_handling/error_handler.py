@@ -14,7 +14,7 @@ class ErrorHandler:
     @classmethod
     def handle_httpx_error(cls, error):
         # log error in the future
-        raise FlightTrackerTimeoutError
+        raise FlightTrackerTimeoutError()
 
 
 @contextmanager
