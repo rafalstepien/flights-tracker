@@ -20,7 +20,7 @@ class OneWayFlight(BaseModel):
     number_of_changes: int
 
     departure_date: str
-    departure_time: str
+    departure_hour: str
     departure_airport: Airport
 
     arrival_time: str
