@@ -155,7 +155,8 @@ class WeekendFlightsService:
         soup = BeautifulSoup(data, "html.parser")
         return soup.find_all("div", {"class": "result"})
 
-    def _process_all_flights(self, all_flights_data: bs4.element.ResultSet) -> List[Flight]:
+    @staticmethod
+    def _process_all_flights(all_flights_data: bs4.element.ResultSet) -> List[Flight]:
         """
         Puts all data to the list as a single Flight() object and returns list of all flights in
         correct format.
@@ -168,11 +169,12 @@ class WeekendFlightsService:
         """
         available_flights = []
         for single_flight_div in all_flights_data:
-            single_flight_data = self._extract_single_flight_data(single_flight_div)
+            single_flight_data = WeekendFlightsService._extract_single_flight_data(single_flight_div)
             available_flights.append(Flight(**single_flight_data))
         return available_flights
 
-    def _extract_single_flight_data(self, single_flight_div: bs4.element.Tag) -> dict:
+    @staticmethod
+    def _extract_single_flight_data(single_flight_div: bs4.element.Tag) -> dict:
         """
         Parses HTML data about single flight and returns dictionary in correct format, ready to create Flight() object.
 
@@ -182,17 +184,17 @@ class WeekendFlightsService:
         Returns: Parsed data for single flight.
 
         """
-        there_data = self._get_one_way_data(single_flight_div, WhichWay.THERE)
-        back_data = self._get_one_way_data(single_flight_div, WhichWay.BACK)
+        there_data = WeekendFlightsService._get_one_way_data(single_flight_div, WhichWay.THERE)
+        back_data = WeekendFlightsService._get_one_way_data(single_flight_div, WhichWay.BACK)
 
         return {
             "flight_there": {
-                "which_way": self._get_element_value(there_data["data"].select("span.caption.tam")),
+                "which_way": WeekendFlightsService._get_element_value(there_data["data"].select("span.caption.tam")),
                 "flight_length": there_data["flight_length"],
-                "price_euro": self._get_element_value(there_data["data"].select("span.subPrice")).replace("€", ""),
+                "price_euro": WeekendFlightsService._get_element_value(there_data["data"].select("span.subPrice")).replace("€", ""),
                 "number_of_changes": there_data["number_of_changes"],
-                "departure_date": self._get_element_value(there_data["data"].select("span.date")),
-                "departure_hour": self._get_element_value(there_data["data"].select("span.from")[0].select("strong")),
+                "departure_date": WeekendFlightsService._get_element_value(there_data["data"].select("span.date")),
+                "departure_hour": WeekendFlightsService._get_element_value(there_data["data"].select("span.from")[0].select("strong")),
                 "departure_airport": {
                     "city": there_data["data"].select("span.from")[0].next_element.next_sibling.text.strip(),
                     "code": there_data["data"]
@@ -207,12 +209,12 @@ class WeekendFlightsService:
                 "airline": there_data["airline"],
             },
             "flight_back": {
-                "which_way": self._get_element_value(back_data["data"].select("span.caption.sem")),
+                "which_way": WeekendFlightsService._get_element_value(back_data["data"].select("span.caption.sem")),
                 "flight_length": back_data["flight_length"],
-                "price_euro": self._get_element_value(back_data["data"].select("span.subPrice")).replace("€", ""),
+                "price_euro": WeekendFlightsService._get_element_value(back_data["data"].select("span.subPrice")).replace("€", ""),
                 "number_of_changes": back_data["number_of_changes"],
-                "departure_date": self._get_element_value(back_data["data"].select("span.date")),
-                "departure_hour": self._get_element_value(back_data["data"].select("span.from")[0].select("strong")),
+                "departure_date": WeekendFlightsService._get_element_value(back_data["data"].select("span.date")),
+                "departure_hour": WeekendFlightsService._get_element_value(back_data["data"].select("span.from")[0].select("strong")),
                 "departure_airport": {
                     "city": back_data["data"].select("span.from")[0].next_element.next_sibling.text.strip(),
                     "code": back_data["data"]

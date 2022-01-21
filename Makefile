@@ -2,4 +2,4 @@ lint:
 	black . && isort . && flake8
 
 coverage:
-	coverage run -m pytest & coverage html
+	coverage run -m pytest
