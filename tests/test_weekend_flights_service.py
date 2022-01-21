@@ -42,7 +42,9 @@ def test_send_request(mocker):
 
 
 def test_extract_all_flights():
-    pass
+    test_data = "<div class=result>test</div>"
+    r = WeekendFlightsService._extract_all_flights(test_data)
+    assert r[0].text == "test"
 
 
 def test_process_all_flights(mocker, single_flight_parsed_data):
