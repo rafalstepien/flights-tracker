@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import bs4
 import pytest
 
-from flights_tracker.models.weekend_flights import WhichWay
+from flights_tracker.models.weekend_flights import WhichWay, Flight
 from flights_tracker.services.weekend_flights_service import WeekendFlightsService
 
 
@@ -45,13 +45,19 @@ def test_extract_all_flights():
     pass
 
 
-def test_process_all_flights():
-    pass
+def test_process_all_flights(mocker, single_flight_parsed_data):
+    mocker.patch(
+        "flights_tracker.services.weekend_flights_service.WeekendFlightsService._extract_single_flight_data",
+        return_value=single_flight_parsed_data,
+    )
+    result = WeekendFlightsService._process_all_flights(['test_flights_data'])
+    assert result == [Flight(**single_flight_parsed_data)]
 
 
-def test_extract_single_flight_data():
-    pass
+def test_extract_single_flight_data(single_flight_object, single_flight_parsed_data):
+    result = WeekendFlightsService._extract_single_flight_data(single_flight_object)
 
+    assert result == single_flight_parsed_data
 
 
 @pytest.mark.parametrize(
@@ -79,13 +85,13 @@ def test_get_one_way_data(single_flight_object, test_input, expected_output):
     result = WeekendFlightsService._get_one_way_data(single_flight_object, test_input)
 
     result = {
-            "data": result["data"].text,
-            "flight_length": result["flight_length"],
-            "number_of_changes": result["number_of_changes"],
-            "arrival_time": result["arrival_time"],
-            "arrival_airport": result["arrival_airport"],
-            "airline": result["airline"],
-        }
+        "data": result["data"].text,
+        "flight_length": result["flight_length"],
+        "number_of_changes": result["number_of_changes"],
+        "arrival_time": result["arrival_time"],
+        "arrival_airport": result["arrival_airport"],
+        "airline": result["airline"],
+    }
 
     assert result == expected_output
 
@@ -118,5 +124,4 @@ def test_get_flight_time_and_changes(mocker, test_input, expected_output):
     ],
 )
 def test_get_element_value(test_input, expected_output):
-
     assert WeekendFlightsService()._get_element_value(test_input) == expected_output
