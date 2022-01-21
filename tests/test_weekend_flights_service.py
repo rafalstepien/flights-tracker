@@ -53,24 +53,41 @@ def test_extract_single_flight_data():
     pass
 
 
-def test_get_one_way_data(single_flight_object):
-    expected_data = (
-        "There Tue 15/02/22 06:55 Warsaw WMIWarsaw (Modlin) WMI 08:45 Oslo TRFOslo (Torp) TRF 1:50 h / no change\n€5.30"
-    )
-    expected_flight_length = "1:50"
-    expected_number_of_changes = "0"
-    expected_arrival_time = "08:45"
-    expected_arrival_airport = "Oslo"
-    expected_airline = "Ryanair"
 
-    result = WeekendFlightsService._get_one_way_data(single_flight_object, WhichWay.THERE)
+@pytest.mark.parametrize(
+    'test_input, expected_output',
+    [
+        ((WhichWay.THERE), {
+            "data": "There Tue 15/02/22 06:55 Warsaw WMIWarsaw (Modlin) WMI 08:45 Oslo TRFOslo (Torp) TRF 1:50 h / no change\n€5.30",
+            "flight_length": "1:50",
+            "number_of_changes": "0",
+            "arrival_time": "08:45",
+            "arrival_airport": "Oslo",
+            "airline": "Ryanair",
+        }),
+        ((WhichWay.BACK), {
+            "data": "Back Fri 18/02/22 09:05 Oslo TRFOslo (Torp) TRF 10:55 Warsaw WMIWarsaw (Modlin) WMI 1:50 h / no change €5.21",
+            "flight_length": "1:50",
+            "number_of_changes": "0",
+            "arrival_time": "10:55",
+            "arrival_airport": "Warsaw",
+            "airline": "Ryanair",
+        }),
+    ]
+)
+def test_get_one_way_data(single_flight_object, test_input, expected_output):
+    result = WeekendFlightsService._get_one_way_data(single_flight_object, test_input)
 
-    assert result["data"].text == expected_data
-    assert result["flight_length"] == expected_flight_length
-    assert result["number_of_changes"] == expected_number_of_changes
-    assert result["arrival_time"] == expected_arrival_time
-    assert result["arrival_airport"] == expected_arrival_airport
-    assert result["airline"] == expected_airline
+    result = {
+            "data": result["data"].text,
+            "flight_length": result["flight_length"],
+            "number_of_changes": result["number_of_changes"],
+            "arrival_time": result["arrival_time"],
+            "arrival_airport": result["arrival_airport"],
+            "airline": result["airline"],
+        }
+
+    assert result == expected_output
 
 
 @pytest.mark.parametrize(
