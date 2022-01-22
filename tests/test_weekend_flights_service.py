@@ -56,8 +56,8 @@ def test_process_all_flights(mocker, single_flight_parsed_data):
     assert result == [Flight(**single_flight_parsed_data)]
 
 
-def test_extract_single_flight_data(single_flight_object, single_flight_parsed_data):
-    result = WeekendFlightsService._extract_single_flight_data(single_flight_object)
+def test_extract_single_flight_data(single_flight_beautiful_soup_object, single_flight_parsed_data):
+    result = WeekendFlightsService._extract_single_flight_data(single_flight_beautiful_soup_object)
 
     assert result == single_flight_parsed_data
 
@@ -83,8 +83,8 @@ def test_extract_single_flight_data(single_flight_object, single_flight_parsed_d
         }),
     ]
 )
-def test_get_one_way_data(single_flight_object, test_input, expected_output):
-    result = WeekendFlightsService._get_one_way_data(single_flight_object, test_input)
+def test_get_one_way_data(single_flight_beautiful_soup_object, test_input, expected_output):
+    result = WeekendFlightsService._get_one_way_data(single_flight_beautiful_soup_object, test_input)
 
     result = {
         "data": result["data"].text,

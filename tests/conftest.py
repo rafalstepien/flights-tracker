@@ -12,7 +12,7 @@ def set_up_test_environment(monkeypatch):
 
 
 @pytest.fixture
-def single_flight_object():
+def single_flight_beautiful_soup_object():
     single_flight_data = read_test_file("example_azair_single_flight.html")
     soup = BeautifulSoup(single_flight_data, "html.parser")
     return soup
