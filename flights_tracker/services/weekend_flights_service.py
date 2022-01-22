@@ -28,10 +28,11 @@ class WeekendFlightsService:
     TEMPLATES_DIR = Path(__file__).resolve().parent / ".." / "templates"
 
     def process(self):
-        data = self.obtain_flights_data()
-        data = self.parse_flights_data(data)
-        message = self.prepare_email_message(data)
-        return message
+        with handle_errors(httpx.ReadTimeout):
+            data = self.obtain_flights_data()
+            data = self.parse_flights_data(data)
+            message = self.prepare_email_message(data)
+            return message
 
     def obtain_flights_data(self) -> str:
         """
@@ -79,11 +80,10 @@ class WeekendFlightsService:
 
     @staticmethod
     def send_request(url):
-        with handle_errors(httpx.ReadTimeout):
-            return httpx.get(
-                url,
-                timeout=config.TIMEOUT,
-            ).text
+        return httpx.get(
+            url,
+            timeout=config.TIMEOUT,
+        ).text
 
     @staticmethod
     def _extract_all_flights(data: str) -> bs4.element.ResultSet:
