@@ -9,7 +9,7 @@ class ConfigLoader(BaseSettings):
     SMTP_PORT: int = 465
     APPLICATION_EMAIL_PASSWORD: str = ""
     APPLICATION_EMAIL_ADDRESS: str = ""
-    RECEIVER_EMAIL: str = ""
+    RECEIVER_EMAIL: list = None
     TIMEOUT: int = 10
 
     class Config:
