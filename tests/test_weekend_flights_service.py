@@ -13,8 +13,12 @@ def test_weekend_flights_service():
     pass
 
 
-def test_obtain_flights_data():
-    pass
+def test_obtain_flights_data(mocker):
+    mock_send_request = mocker.patch(
+        "flights_tracker.services.weekend_flights_service.WeekendFlightsService.send_request"
+    )
+    WeekendFlightsService().obtain_flights_data()
+    assert mock_send_request.called
 
 
 def test_parse_flights_data(single_flight_html, single_flight_parsed_data):
