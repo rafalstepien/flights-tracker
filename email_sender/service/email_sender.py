@@ -1,15 +1,13 @@
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from smtplib import SMTP_SSL
 from ssl import create_default_context
 from typing import NoReturn
 
 from config_loader.config_loader import config
 
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
 
 class EmailSender:
-
     @staticmethod
     def _message_sender(message: str) -> NoReturn:
 

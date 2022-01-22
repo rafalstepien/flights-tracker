@@ -2,7 +2,6 @@ import pytest
 from bs4 import BeautifulSoup
 
 from config_loader.config_loader import config
-
 from tests.utils import read_test_file
 
 
@@ -26,15 +25,9 @@ def single_flight_parsed_data():
             "number_of_changes": "0",
             "departure_date": "Fri 15/02/22",
             "departure_hour": "06:55",
-            "departure_airport": {
-                "city": "Warsaw",
-                "code": "WMI"
-            },
+            "departure_airport": {"city": "Warsaw", "code": "WMI"},
             "arrival_time": "08:45",
-            "arrival_airport": {
-                "city": "Oslo",
-                "code": "TRF"
-            },
+            "arrival_airport": {"city": "Oslo", "code": "TRF"},
             "airline": "Ryanair",
         },
         "flight_back": {
@@ -44,18 +37,12 @@ def single_flight_parsed_data():
             "number_of_changes": "0",
             "departure_date": "Mon 18/02/22",
             "departure_hour": "09:05",
-            "departure_airport": {
-                "city": "Oslo",
-                "code": "TRF"
-            },
+            "departure_airport": {"city": "Oslo", "code": "TRF"},
             "arrival_time": "10:55",
-            "arrival_airport": {
-                "city": "Warsaw",
-                "code": "WMI"
-            },
+            "arrival_airport": {"city": "Warsaw", "code": "WMI"},
             "airline": "Ryanair",
         },
-        "total_price": '10.51'
+        "total_price": "10.51",
     }
 
 

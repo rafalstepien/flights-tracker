@@ -1,10 +1,11 @@
 import re
 from pathlib import Path
 from typing import List, Tuple, Union
-from jinja2 import Environment, FileSystemLoader
+
 import bs4.element
 import httpx
 from bs4 import BeautifulSoup
+from jinja2 import Environment, FileSystemLoader
 
 from config_loader.config_loader import config
 from flights_tracker.models.weekend_flights import Flight, WhichWay
@@ -25,6 +26,7 @@ class WeekendFlightsService:
     """
     Service for obtaining flights data, processing it and returning as ready-to-send message.
     """
+
     TEMPLATES_DIR = Path(__file__).resolve().parent / ".." / "templates"
 
     def process(self):
@@ -70,7 +72,7 @@ class WeekendFlightsService:
 
         """
         env = Environment(loader=FileSystemLoader(WeekendFlightsService.TEMPLATES_DIR))
-        template = env.get_template('email_report.html')
+        template = env.get_template("email_report.html")
         return template.render(flights=data)
 
     @staticmethod
@@ -131,7 +133,11 @@ class WeekendFlightsService:
     def is_weekend_flight(flight: Flight) -> bool:
         departure_weekday = flight.flight_there.departure_date[:3].lower()
         comeback_weekday = flight.flight_back.departure_date[:3].lower()
-        return departure_weekday in (Weekdays.THURSDAY[:3], Weekdays.FRIDAY[:3]) and comeback_weekday in (Weekdays.SATURDAY[:3], Weekdays.SUNDAY[:3], Weekdays.MONDAY[:3])
+        return departure_weekday in (Weekdays.THURSDAY[:3], Weekdays.FRIDAY[:3]) and comeback_weekday in (
+            Weekdays.SATURDAY[:3],
+            Weekdays.SUNDAY[:3],
+            Weekdays.MONDAY[:3],
+        )
 
     @staticmethod
     def _get_query_params() -> str:
@@ -217,9 +223,13 @@ class WeekendFlightsService:
 
         """
         there_data = WeekendFlightsService._get_one_way_data(single_flight_div, WhichWay.THERE)
-        price_there = WeekendFlightsService._get_element_value(there_data["data"].select("span.subPrice")).replace("€", "")
+        price_there = WeekendFlightsService._get_element_value(there_data["data"].select("span.subPrice")).replace(
+            "€", ""
+        )
         back_data = WeekendFlightsService._get_one_way_data(single_flight_div, WhichWay.BACK)
-        price_back = WeekendFlightsService._get_element_value(back_data["data"].select("span.subPrice")).replace("€", "")
+        price_back = WeekendFlightsService._get_element_value(back_data["data"].select("span.subPrice")).replace(
+            "€", ""
+        )
 
         return {
             "flight_there": {
@@ -228,7 +238,9 @@ class WeekendFlightsService:
                 "price_euro": price_there,
                 "number_of_changes": there_data["number_of_changes"],
                 "departure_date": WeekendFlightsService._get_element_value(there_data["data"].select("span.date")),
-                "departure_hour": WeekendFlightsService._get_element_value(there_data["data"].select("span.from")[0].select("strong")),
+                "departure_hour": WeekendFlightsService._get_element_value(
+                    there_data["data"].select("span.from")[0].select("strong")
+                ),
                 "departure_airport": {
                     "city": there_data["data"].select("span.from")[0].next_element.next_sibling.text.strip(),
                     "code": there_data["data"]
@@ -248,7 +260,9 @@ class WeekendFlightsService:
                 "price_euro": price_back,
                 "number_of_changes": back_data["number_of_changes"],
                 "departure_date": WeekendFlightsService._get_element_value(back_data["data"].select("span.date")),
-                "departure_hour": WeekendFlightsService._get_element_value(back_data["data"].select("span.from")[0].select("strong")),
+                "departure_hour": WeekendFlightsService._get_element_value(
+                    back_data["data"].select("span.from")[0].select("strong")
+                ),
                 "departure_airport": {
                     "city": back_data["data"].select("span.from")[0].next_element.next_sibling.text.strip(),
                     "code": back_data["data"]
@@ -262,7 +276,7 @@ class WeekendFlightsService:
                 },
                 "airline": back_data["airline"],
             },
-            "total_price": f"{round(float(price_there) + float(price_back), 2)}"
+            "total_price": f"{round(float(price_there) + float(price_back), 2)}",
         }
 
     @staticmethod

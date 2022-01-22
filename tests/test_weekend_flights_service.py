@@ -2,12 +2,11 @@ from unittest.mock import Mock
 
 import bs4
 import pytest
-
-from flights_tracker.models.weekend_flights import WhichWay, Flight
-from flights_tracker.services.weekend_flights_service import WeekendFlightsService
-
-from httpx import ReadTimeout
 from fastapi import HTTPException
+from httpx import ReadTimeout
+
+from flights_tracker.models.weekend_flights import Flight, WhichWay
+from flights_tracker.services.weekend_flights_service import WeekendFlightsService
 
 
 def test_weekend_flights_service():
@@ -58,7 +57,7 @@ def test_process_all_flights(mocker, single_flight_parsed_data):
         "flights_tracker.services.weekend_flights_service.WeekendFlightsService._extract_single_flight_data",
         return_value=single_flight_parsed_data,
     )
-    result = WeekendFlightsService._process_all_flights(['test_flights_data'])
+    result = WeekendFlightsService._process_all_flights(["test_flights_data"])
     assert result == [Flight(**single_flight_parsed_data)]
 
 
@@ -69,25 +68,33 @@ def test_extract_single_flight_data(single_flight_beautiful_soup_object, single_
 
 
 @pytest.mark.parametrize(
-    'test_input, expected_output',
+    "test_input, expected_output",
     [
-        ((WhichWay.THERE), {
-            "data": "There Fri 15/02/22 06:55 Warsaw WMIWarsaw (Modlin) WMI 08:45 Oslo TRFOslo (Torp) TRF 1:50 h / no change\n€5.30",
-            "flight_length": "1:50",
-            "number_of_changes": "0",
-            "arrival_time": "08:45",
-            "arrival_airport": "Oslo",
-            "airline": "Ryanair",
-        }),
-        ((WhichWay.BACK), {
-            "data": "Back Mon 18/02/22 09:05 Oslo TRFOslo (Torp) TRF 10:55 Warsaw WMIWarsaw (Modlin) WMI 1:50 h / no change €5.21",
-            "flight_length": "1:50",
-            "number_of_changes": "0",
-            "arrival_time": "10:55",
-            "arrival_airport": "Warsaw",
-            "airline": "Ryanair",
-        }),
-    ]
+        (
+            (WhichWay.THERE),
+            {
+                "data": "There Fri 15/02/22 06:55 Warsaw WMIWarsaw (Modlin) WMI "
+                "08:45 Oslo TRFOslo (Torp) TRF 1:50 h / no change\n€5.30",
+                "flight_length": "1:50",
+                "number_of_changes": "0",
+                "arrival_time": "08:45",
+                "arrival_airport": "Oslo",
+                "airline": "Ryanair",
+            },
+        ),
+        (
+            (WhichWay.BACK),
+            {
+                "data": "Back Mon 18/02/22 09:05 Oslo TRFOslo (Torp) TRF "
+                "10:55 Warsaw WMIWarsaw (Modlin) WMI 1:50 h / no change €5.21",
+                "flight_length": "1:50",
+                "number_of_changes": "0",
+                "arrival_time": "10:55",
+                "arrival_airport": "Warsaw",
+                "airline": "Ryanair",
+            },
+        ),
+    ],
 )
 def test_get_one_way_data(single_flight_beautiful_soup_object, test_input, expected_output):
     result = WeekendFlightsService._get_one_way_data(single_flight_beautiful_soup_object, test_input)
@@ -136,8 +143,10 @@ def test_get_element_value(test_input, expected_output):
 
 
 def test_tracker_handles_timeout_error(mocker):
-    mocker.patch('flights_tracker.services.weekend_flights_service.WeekendFlightsService.send_request',
-                 side_effect=ReadTimeout(message="123"))
+    mocker.patch(
+        "flights_tracker.services.weekend_flights_service.WeekendFlightsService.send_request",
+        side_effect=ReadTimeout(message="123"),
+    )
 
     with pytest.raises(HTTPException) as e:
         WeekendFlightsService().process()

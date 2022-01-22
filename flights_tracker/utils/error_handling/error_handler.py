@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 
 from fastapi import HTTPException, status
-
 from httpx import ReadTimeout
 
 
@@ -16,7 +15,7 @@ class ErrorHandler:
         # log error in the future
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
-            detail="Data provider was unable to process the request. Please try again for a while."
+            detail="Data provider was unable to process the request. Please try again for a while.",
         )
 
 
