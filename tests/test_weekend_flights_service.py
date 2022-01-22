@@ -18,12 +18,15 @@ def test_obtain_flights_data():
     pass
 
 
-def test_parse_flights_data():
-    pass
+def test_parse_flights_data(single_flight_html, single_flight_parsed_data):
+    result = WeekendFlightsService().parse_flights_data(single_flight_html)
+    assert result == [Flight(**single_flight_parsed_data)]
 
 
-def test_prepare_email_message():
-    pass
+def test_prepare_email_message(single_flight_parsed_data, rendered_email_message_for_one_flight):
+    data = [Flight(**single_flight_parsed_data)]
+    result = WeekendFlightsService.prepare_email_message(data)
+    assert result == rendered_email_message_for_one_flight
 
 
 def test_prepare_url(mocker):
@@ -69,7 +72,7 @@ def test_extract_single_flight_data(single_flight_beautiful_soup_object, single_
     'test_input, expected_output',
     [
         ((WhichWay.THERE), {
-            "data": "There Tue 15/02/22 06:55 Warsaw WMIWarsaw (Modlin) WMI 08:45 Oslo TRFOslo (Torp) TRF 1:50 h / no change\n€5.30",
+            "data": "There Fri 15/02/22 06:55 Warsaw WMIWarsaw (Modlin) WMI 08:45 Oslo TRFOslo (Torp) TRF 1:50 h / no change\n€5.30",
             "flight_length": "1:50",
             "number_of_changes": "0",
             "arrival_time": "08:45",
@@ -77,7 +80,7 @@ def test_extract_single_flight_data(single_flight_beautiful_soup_object, single_
             "airline": "Ryanair",
         }),
         ((WhichWay.BACK), {
-            "data": "Back Fri 18/02/22 09:05 Oslo TRFOslo (Torp) TRF 10:55 Warsaw WMIWarsaw (Modlin) WMI 1:50 h / no change €5.21",
+            "data": "Back Mon 18/02/22 09:05 Oslo TRFOslo (Torp) TRF 10:55 Warsaw WMIWarsaw (Modlin) WMI 1:50 h / no change €5.21",
             "flight_length": "1:50",
             "number_of_changes": "0",
             "arrival_time": "10:55",
@@ -139,4 +142,4 @@ def test_tracker_handles_timeout_error(mocker):
     with pytest.raises(HTTPException) as e:
         WeekendFlightsService().process()
 
-    assert e.value.detail == "Data provider was unable to process the request"
+    assert e.value.detail == "Data provider was unable to process the request. Please try again for a while."

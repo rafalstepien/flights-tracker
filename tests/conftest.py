@@ -12,10 +12,8 @@ def set_up_test_environment(monkeypatch):
 
 
 @pytest.fixture
-def single_flight_beautiful_soup_object():
-    single_flight_data = read_test_file("example_azair_single_flight.html")
-    soup = BeautifulSoup(single_flight_data, "html.parser")
-    return soup
+def single_flight_beautiful_soup_object(single_flight_html):
+    return BeautifulSoup(single_flight_html, "html.parser")
 
 
 @pytest.fixture
@@ -26,7 +24,7 @@ def single_flight_parsed_data():
             "flight_length": "1:50",
             "price_euro": "5.30",
             "number_of_changes": "0",
-            "departure_date": "Tue 15/02/22",
+            "departure_date": "Fri 15/02/22",
             "departure_hour": "06:55",
             "departure_airport": {
                 "city": "Warsaw",
@@ -44,7 +42,7 @@ def single_flight_parsed_data():
             "flight_length": "1:50",
             "price_euro": "5.21",
             "number_of_changes": "0",
-            "departure_date": "Fri 18/02/22",
+            "departure_date": "Mon 18/02/22",
             "departure_hour": "09:05",
             "departure_airport": {
                 "city": "Oslo",
@@ -57,4 +55,15 @@ def single_flight_parsed_data():
             },
             "airline": "Ryanair",
         },
+        "total_price": '10.51'
     }
+
+
+@pytest.fixture
+def rendered_email_message_for_one_flight():
+    return read_test_file("rendered_email_message_for_one_flight.html")
+
+
+@pytest.fixture
+def single_flight_html():
+    return read_test_file("example_azair_single_weekend_flight.html")
