@@ -9,8 +9,15 @@ from flights_tracker.models.weekend_flights import Flight, WhichWay
 from flights_tracker.services.weekend_flights_service import WeekendFlightsService
 
 
-def test_weekend_flights_service():
-    pass
+def test_weekend_flights_service(mocker, single_flight_html, rendered_email_message_for_one_flight):
+    mocker.patch(
+        "flights_tracker.services.weekend_flights_service.WeekendFlightsService.send_request",
+        return_value=single_flight_html,
+    )
+
+    message = WeekendFlightsService().process()
+
+    assert message == rendered_email_message_for_one_flight
 
 
 def test_obtain_flights_data(mocker):
