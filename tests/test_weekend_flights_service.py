@@ -6,6 +6,9 @@ import pytest
 from flights_tracker.models.weekend_flights import WhichWay, Flight
 from flights_tracker.services.weekend_flights_service import WeekendFlightsService
 
+from httpx import ReadTimeout
+from fastapi import HTTPException
+
 
 def test_weekend_flights_service():
     pass
@@ -127,3 +130,13 @@ def test_get_flight_time_and_changes(mocker, test_input, expected_output):
 )
 def test_get_element_value(test_input, expected_output):
     assert WeekendFlightsService()._get_element_value(test_input) == expected_output
+
+
+def test_tracker_handles_timeout_error(mocker):
+    mocker.patch('flights_tracker.services.weekend_flights_service.WeekendFlightsService.send_request',
+                 side_effect=ReadTimeout(message="123"))
+
+    with pytest.raises(HTTPException) as e:
+        WeekendFlightsService().process()
+
+    assert e.value.detail == "Data provider was unable to process the request"
