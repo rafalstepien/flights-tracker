@@ -35,6 +35,7 @@ class OneWayFlight(BaseModel):
 class Flight(BaseModel):
     flight_there: OneWayFlight
     flight_back: OneWayFlight
+    total_price: str
 
 
 # TODO: Handle overnight fligts

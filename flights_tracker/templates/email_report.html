@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h1>Interesting flights in the near future</h1>
+    <h3>Weekend flights</h3>
+
+    <div>
+        <ol>
+            {% for flight in flights %}
+            <li><div><b>{{flight.flight_there.departure_airport.city}} - {{flight.flight_there.arrival_airport.city}} - {{flight.flight_there.departure_airport.city}}</b></div></li>
+            <ul>
+                <li><b>Departure:</b> {{flight.flight_there.departure_date}}, at {{flight.flight_there.departure_hour}}</li>
+                <li><b>Comeback:</b> {{flight.flight_back.departure_date}}, at {{flight.flight_back.departure_hour}}</li>
+                <li><b>Total price (€):</b> {{flight.total_price}}</li>
+                <li><b>Changes:</b> {{flight.flight_there.number_of_changes}}/{{flight.flight_back.number_of_changes}}</li>
+                <li><b>Airline:</b> {{flight.flight_there.airline}} / {{flight.flight_back.airline}}</li>
+            </ul>
+            {% endfor %}
+        </ol>
+    </div>
+
+</body>
+</html>
