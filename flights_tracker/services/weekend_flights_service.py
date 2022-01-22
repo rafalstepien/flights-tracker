@@ -89,6 +89,16 @@ class WeekendFlightsService:
 
     @staticmethod
     def _extract_all_flights(data: str) -> bs4.element.ResultSet:
+        """
+        Get beautifulsoup object from scraped data including just divs of class="result".
+
+        Args:
+            data: Scraped data.
+
+        Returns:
+            Beautifulsoup object created from scraped data.
+
+        """
         soup = BeautifulSoup(data, "html.parser")
         return soup.find_all("div", {"class": "result"})
 
@@ -119,6 +129,7 @@ class WeekendFlightsService:
             all_flights: Parsed data about all flights.
 
         Returns:
+            Extracted weekend flights from all of the flights.
 
         """
         just_weekend_flights = []
@@ -131,6 +142,15 @@ class WeekendFlightsService:
 
     @staticmethod
     def is_weekend_flight(flight: Flight) -> bool:
+        """
+        Whether flight matches the requirements for being weekend flight.
+
+        Args:
+            flight: Flight object.
+
+        Returns: Whether flights is weekend flight.
+
+        """
         departure_weekday = flight.flight_there.departure_date[:3].lower()
         comeback_weekday = flight.flight_back.departure_date[:3].lower()
         return departure_weekday in (Weekdays.THURSDAY[:3], Weekdays.FRIDAY[:3]) and comeback_weekday in (
