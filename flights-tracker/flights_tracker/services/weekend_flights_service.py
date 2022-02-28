@@ -1,6 +1,7 @@
 import re
 from pathlib import Path
 from typing import List, Tuple, Union
+from datetime import datetime, timedelta
 
 import bs4.element
 import httpx
@@ -171,8 +172,9 @@ class WeekendFlightsService:
         srcAirport = "Poland+%5BSZY%5D+%28%2BWMI%2CWAW%2CGDN%2CBZG%2CLCJ%2CLUZ%2CPOZ%2CKRK%2CKTW%2CRZE%2CSZZ%2CWRO%29&"
         srcap = PolishAirports.get_srcap_parameter()
         destination_anywhere = "Anywhere+%5BXXX%5D"
-        soonest_depart_date = "2022-02-01"
-        latest_arrival_date = "2022-02-28"
+        today = datetime.now()
+        soonest_depart_date = today.strftime("%Y-%m-%d")
+        latest_arrival_date = (today + timedelta(60)).strftime("%Y-%m-%d")
         min_days_stay = 2
         max_days_stay = 3
         depmonth = "".join(soonest_depart_date.split("-")[:-1])
